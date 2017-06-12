@@ -26,7 +26,7 @@ module SassC::Rails
             environment: input[:environment],
             dependencies: context.metadata[:dependency_paths]
           }
-        }.merge(config_options) { |*args| safe_merge(*args) }
+        }.merge(config_options) { |key, left, right| safe_merge(key, left, right) }
 
         engine = ::SassC::Engine.new(input[:data], options)
 
@@ -97,7 +97,7 @@ module SassC::Rails
 
     def safe_merge(key, left, right)
       if [left, right].all? { |v| v.is_a? Hash }
-        left.merge(right) { |*args| safe_merge *args }
+        left.merge(right) { |key, l, r| safe_merge key, l, r }
       elsif [left, right].all? { |v| v.is_a? Array }
         (left + right).uniq
       else
